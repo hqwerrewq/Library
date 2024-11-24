@@ -1,5 +1,4 @@
-from infrastructure.functions.TerminalMenu import ConsoleInterface
-from infrastructure.menus.console_interface import Menu
+from infrastructure.menus.console_interface import ConsoleInterface, Menu
 from services.interfaces.library_service_interface import LibraryServicesInterface
 
 
@@ -10,7 +9,7 @@ class SearchBookLibraryView:
         self.console = console
 
     async def __call__(self):
-
+        """Метод отображения поиска книг по параметрам"""
         self.console.clear_console()
 
         search_data = self.menu.search_book_menu()
@@ -21,7 +20,7 @@ class SearchBookLibraryView:
             if not books:
                 self.console.display_message("Книг по заданным параметрам не найдено.")
             else:
-                self.menu.display_books_list(books)
+                self.console.display_books(books)
 
         except Exception as e:
             self.console.display_message(f"Ошибка при поиске книги: {e}")

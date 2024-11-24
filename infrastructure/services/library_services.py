@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import List
 
-from infrastructure.functions.TerminalMenu import ConsoleInterface
+from infrastructure.menus.console_interface import ConsoleInterface
 from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface
 from services.interfaces.library_service_interface import LibraryServicesInterface
 from models.LibraryModels import Book
@@ -39,10 +39,9 @@ class LibraryServices(LibraryServicesInterface, ABC):
 
             if not books:
                 return []  # Возвращаем пустой список, если книг нет
-            return books  # Возвращаем книги, если они есть
+            return books
 
         except Exception as e:
-            # Логирование или обработка ошибок
             self.console.display_message(f"Ошибка при получении книг: {e}")
             return []  # Возвращаем пустой список в случае ошибки
 
@@ -59,13 +58,11 @@ class LibraryServices(LibraryServicesInterface, ABC):
             books = await self.library_repository.search(title=title, author=author, year=year)
 
             if not books:
-                # Если книги не найдены, логируем сообщение
-                print("Книги соответствующие параметрам поиска, не найдены.")
+                self.console.display_message("Книги соответствующие параметрам поиска, не найдены.")
 
             return books
         except Exception as e:
-            # Обработка ошибок уровня репозитория или других исключений
-            print(f"Ошибка при выполнении поиска книг: {e}")
+            self.console.display_message(f"Ошибка при выполнении поиска книг: {e}")
             return []
 
     async def patch_book(self, book_id: int, data: dict) -> Book:
@@ -73,9 +70,8 @@ class LibraryServices(LibraryServicesInterface, ABC):
         Обновление данных книги.
         :param book_id: Идентификатор книги для обновления.
         :param data: Словарь с новыми данными для книги.
-        :return: Обновленный объект Book.
+        :return: Обновленный объект книги.
         """
-        # Проверяем входные данные (можно также использовать pydantic-схему для валидации)
         if not data:
             raise ValueError("Переданы пустые данные для обновления.")
 
@@ -87,7 +83,6 @@ class LibraryServices(LibraryServicesInterface, ABC):
         except ValueError as e:
             raise ValueError(f"Ошибка в данных или книга с ID {book_id} не найдена: {e}")
         except Exception as e:
-            # Логирование можно заменить на библиотеку logging
             print(f"Неожиданная ошибка при обновлении книги: {e}")
 
     async def delete_book(self, book_id: int) -> None:

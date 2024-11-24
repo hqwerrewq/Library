@@ -125,6 +125,8 @@ class Menu:
 
     def search_book_menu(self):
 
+        """Меню для поиска книги по параметрам."""
+
         self.console.display_message('Введите параметры поиска книги.')
         self.console.display_message('Ненужные параметры оставьте пустыми.')
         while True:

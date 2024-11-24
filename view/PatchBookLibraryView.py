@@ -10,7 +10,7 @@ class PatchBookLibraryView:
 
 
     async def __call__(self):
-
+        """Метод отображения обновления данных книги, в данном случае, только статуса"""
         self.console.clear_console()
 
         patch_data = self.menu.patch_book_menu()

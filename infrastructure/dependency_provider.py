@@ -1,4 +1,4 @@
-from infrastructure.functions.TerminalMenu import ConsoleInterface
+from infrastructure.menus.console_interface import ConsoleInterface
 from infrastructure.repositories.library_repositories import LibraryRepositories
 from infrastructure.services.library_services import LibraryServices
 from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface

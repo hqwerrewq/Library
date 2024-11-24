@@ -1,4 +1,4 @@
-from infrastructure.functions.TerminalMenu import delete_book_menu
+from infrastructure.menus.console_interface import delete_book_menu
 from services.interfaces.library_service_interface import ILibraryServices
 
 

@@ -9,6 +9,7 @@ class GetBookLibraryView:
         self.console = console
 
     async def __call__(self):
+        """Метод отображения получения всех книг"""
         try:
             books = await self.library_service.get_all_books()
             if not books:

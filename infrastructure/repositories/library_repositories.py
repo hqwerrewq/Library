@@ -3,7 +3,7 @@ from abc import ABC
 from pathlib import Path
 from typing import List
 
-from infrastructure.functions.TerminalMenu import ConsoleInterface
+from infrastructure.menus.console_interface import ConsoleInterface
 from infrastructure.functions.random import random_id_generator
 from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface
 from models.LibraryModels import Book
@@ -87,9 +87,14 @@ class LibraryRepositories(LibraryRepositoriesInterface, ABC):
             return []
 
     async def search(self, title: str = None, author: str = None, year: int = None) -> List[Book]:
-        """Поиск книг по параметрам."""
+        """
+        Поиск книг по параметрам.
+        :param title: Название книги
+        :param author: Автор книги
+        :param year: Год издания книги
+        :return: Список найденых книг
+        """
         try:
-            # Загружаем данные из файла
             if not self.file_path.is_file():
                 self.console.display_message("Файл с книгами не найден.")
                 return []
@@ -114,7 +119,6 @@ class LibraryRepositories(LibraryRepositoriesInterface, ABC):
 
             return filtered_books
         except Exception as e:
-            # Логирование или обработка ошибок
             self.console.display_message(f"Ошибка при поиске книг: {e}")
             return []
 
@@ -138,11 +142,9 @@ class LibraryRepositories(LibraryRepositoriesInterface, ABC):
             # Ищем книгу с указанным ID
             for book in books_data:
                 if book["id"] == book_id:
-                    # Обновляем только те поля, которые переданы в `data`
                     for key, value in data.items():
                         if key in book:
                             book[key] = value
-                    # Перезаписываем файл
                     with self.file_path.open("w") as file:
                         json.dump(books_data, file, indent=4)
                     return Book(**book)
@@ -150,12 +152,10 @@ class LibraryRepositories(LibraryRepositoriesInterface, ABC):
             raise ValueError(f"Книга с ID {book_id} не найдена.")
 
         except Exception as e:
-            # Логируем или обрабатываем ошибку
             print(f"Ошибка при обновлении книги: {e}")
             raise
 
     async def delete(self, book_id: int) -> None:
-
         if self.file_path.is_file():
             with self.file_path.open("r") as file:
                 try:
