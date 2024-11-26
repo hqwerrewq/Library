@@ -4,6 +4,6 @@
         "title": "Test",
         "author": "Test",
         "year": 123,
-        "status": false
+        "status": true
     }
 ]

@@ -1,8 +1,12 @@
 import asyncio
+from pathlib import Path
 
 from infrastructure.dependency_provider import DependencyProvider
 from infrastructure.menus.console_interface import ConsoleInterface, Menu, MenuHandler
+from infrastructure.repositories.library_repositories import LibraryRepositories
+from json_database.json_database import JsonDatabase
 from view.CreateBookLibraryView import CreateBookLibraryView
+from view.DeleteBookLibraryView import DeleteBookLibraryView
 from view.GetBookLibraryView import GetBookLibraryView
 from view.PatchBookLibraryView import PatchBookLibraryView
 from view.SearchBookLibraryView import SearchBookLibraryView
@@ -10,6 +14,7 @@ from view.install.InstallLibraryView import InstallLibraryView
 
 
 def initialize_library_system():
+
     console_interface = ConsoleInterface()
     dependency_provider = DependencyProvider()
     menu_handler = MenuHandler(console=console_interface)
@@ -33,6 +38,10 @@ def initialize_library_system():
     menu_handler.register_action(
         4,
         PatchBookLibraryView(library_service=dependency_provider.get_library_service(), menu=menu, console=console_interface),
+    )
+    menu_handler.register_action(
+        5,
+        DeleteBookLibraryView(library_service=dependency_provider.get_library_service(), menu=menu, console=console_interface)
     )
     install_view = InstallLibraryView(menu_handler=menu_handler, menu=menu)
 

@@ -1,6 +1,10 @@
+from os import PathLike
+from pathlib import Path
+
 from infrastructure.menus.console_interface import ConsoleInterface
 from infrastructure.repositories.library_repositories import LibraryRepositories
 from infrastructure.services.library_services import LibraryServices
+from json_database.json_database import JsonDatabase
 from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface
 from services.interfaces.library_service_interface import LibraryServicesInterface
 
@@ -12,7 +16,7 @@ class DependencyProvider:
         library_repository: LibraryRepositoriesInterface = None,
     ):
         self._library_repository = (
-            library_repository or LibraryRepositories(console=ConsoleInterface())
+            library_repository or LibraryRepositories(console=ConsoleInterface(), json_database=JsonDatabase())
         )
         self._library_service = (
             library_service or LibraryServices(library_repository=self._library_repository, console=ConsoleInterface())
@@ -33,3 +37,7 @@ class DependencyProvider:
     def set_library_repository(self, library_repository: LibraryRepositoriesInterface):
         """Метод для установки кастомного репозитория библиотеки."""
         self._library_repository = library_repository
+
+
+
+

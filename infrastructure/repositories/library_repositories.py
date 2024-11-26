@@ -1,178 +1,64 @@
-import json
 from abc import ABC
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from infrastructure.menus.console_interface import ConsoleInterface
 from infrastructure.functions.random import random_id_generator
+from json_database.json_database import JsonDatabase
 from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface
 from models.LibraryModels import Book
 
 
 class LibraryRepositories(LibraryRepositoriesInterface, ABC):
 
-    def __init__(self, console: ConsoleInterface):
+    def __init__(self, console: ConsoleInterface, json_database: JsonDatabase):
         self.console = console
-        self.file_path = Path("json_database/data.json")
+        self.db = json_database
 
     async def add_one(self, title: str, author: str, year: str) -> Book:
-        """
-        Добавление книги в JSON файл (Базу данных).
-        :param title: Название книги
-        :param author: Автор книги
-        :param year: Год издания книги
-        :return: Объект книги
-        """
-        # Генерация уникального ID для книги
-        gen = random_id_generator()
-        book_id = next(gen)
-
-        new_book = Book(
-            id=book_id,
-            title=title,
-            author=author,
-            year=year,
-            status=True
-        )
+        """Добавление книги."""
+        book_id = next(random_id_generator())
+        new_book = Book(id=book_id, title=title, author=author, year=year, status=True)
 
         try:
-            if self.file_path.is_file():
-                with self.file_path.open("r") as file:
-                    try:
-                        existing_data = json.load(file)
-                    except json.JSONDecodeError:
-                        existing_data = []
-            else:
-                existing_data = []
-
-            # Добавляем книгу в список
-            if isinstance(existing_data, list):
-                existing_data.append(new_book.__dict__)
-            else:
-                existing_data = [existing_data, new_book.__dict__]
-
-            # Сохраняем в файл
-            with self.file_path.open("w") as file:
-                json.dump(existing_data, file, indent=4)
-
-            self.console.display_message(f"Данные успешно сохранены в {self.file_path}")
-
+            self.db.add_record(new_book.__dict__)
+            self.console.display_message("Книга успешно добавлена.")
             return new_book
         except Exception as e:
-
-            self.console.display_message(f"Ошибка при сохранении данных: {e}")
-
-            raise ValueError("Не удалось сохранить книгу в базу данных.")
+            self.console.display_message(f"Ошибка при добавлении книги: {e}")
+            raise ValueError("Не удалось добавить книгу в базу данных.")
 
     async def get_all(self) -> List[Book]:
-        """ Получение всех книг из файла и преобразование в объекты Book """
+        """Получение всех книг."""
         try:
-            if self.file_path.is_file():
-                with self.file_path.open("r") as file:
-                    try:
-                        data = json.load(file)
-                        # Преобразуем данные в объекты Book
-                        return [Book(**book) for book in data]
-                    except json.JSONDecodeError:
-
-                        self.console.display_message("Ошибка чтения JSON, файл поврежден.")
-
-                        return []
-            else:
-                self.console.display_message("Файл не найден.")
-                return []
+            records = self.db.get_all_records()
+            return [Book(**record) for record in records]
         except Exception as e:
-            # Логирование ошибки (например, файл не доступен)
-            self.console.display_message(f"Ошибка при загрузке данных: {e}")
+            self.console.display_message(f"Ошибка при получении книг: {e}")
             return []
 
-    async def search(self, title: str = None, author: str = None, year: int = None) -> List[Book]:
-        """
-        Поиск книг по параметрам.
-        :param title: Название книги
-        :param author: Автор книги
-        :param year: Год издания книги
-        :return: Список найденых книг
-        """
-        try:
-            if not self.file_path.is_file():
-                self.console.display_message("Файл с книгами не найден.")
-                return []
+    async def search(self, title: Optional[str] = None, author: Optional[str] = None, year: Optional[int] = None) -> List[Book]:
+        """Поиск книг."""
+        books = await self.get_all()
+        return [
+            book for book in books
+            if (title is None or title.lower() in book.title.lower()) and
+               (author is None or author.lower() in book.author.lower()) and
+               (year is None or str(year) == str(book.year))
+        ]
 
-            with self.file_path.open("r") as file:
-                try:
-                    books_data = json.load(file)
-                except json.JSONDecodeError:
-                    self.console.display_message("Ошибка чтения JSON, файл поврежден.")
-                    return []
-
-            # Преобразуем данные в объекты Book
-            books = [Book(**book) for book in books_data]
-
-            # Фильтруем книги по параметрам
-            filtered_books = [
-                book for book in books
-                if (title is None or title.lower() in book.title.lower()) and
-                   (author is None or author.lower() in book.author.lower()) and
-                   (year is None or str(year) == str(book.year))
-            ]
-
-            return filtered_books
-        except Exception as e:
-            self.console.display_message(f"Ошибка при поиске книг: {e}")
-            return []
-
-    async def patch(self, book_id: int, data: dict) -> Book:
-        """
-        Обновление данных книги в JSON-файле.
-        :param book_id: Идентификатор книги для обновления.
-        :param data: Словарь с новыми данными для книги.
-        :return: Обновленный объект Book.
-        """
-        try:
-            if not self.file_path.is_file():
-                raise FileNotFoundError("Файл с книгами не найден.")
-
-            with self.file_path.open("r") as file:
-                try:
-                    books_data = json.load(file)
-                except json.JSONDecodeError:
-                    raise ValueError("Ошибка чтения JSON, файл поврежден.")
-
-            # Ищем книгу с указанным ID
-            for book in books_data:
-                if book["id"] == book_id:
-                    for key, value in data.items():
-                        if key in book:
-                            book[key] = value
-                    with self.file_path.open("w") as file:
-                        json.dump(books_data, file, indent=4)
-                    return Book(**book)
-
-            raise ValueError(f"Книга с ID {book_id} не найдена.")
-
-        except Exception as e:
-            print(f"Ошибка при обновлении книги: {e}")
-            raise
+    async def patch(self, book_id: int, data: dict) -> Optional[Book]:
+        """Обновление данных книги."""
+        updated_record = self.db.update_record(book_id, data)
+        if updated_record:
+            self.console.display_message(f"Книга с ID {book_id} обновлена.")
+            return Book(**updated_record)
+        self.console.display_message(f"Книга с ID {book_id} не найдена.")
+        return None
 
     async def delete(self, book_id: int) -> None:
-        if self.file_path.is_file():
-            with self.file_path.open("r") as file:
-                try:
-                    data = json.load(file)
-                except json.JSONDecodeError:
-                    self.console.display_message("Ошибка чтения JSON. Файл поврежден или пустой.")
-                    data = []
-
-            updated_data = [item for item in data if item.get("id") != book_id]
-
-
-            if len(data) == len(updated_data):
-                self.console.display_message(f"Объект с ID {book_id} не найден.")
-            else:
-
-                with self.file_path.open("w") as file:
-                    json.dump(updated_data, file, indent=4)
-                self.console.display_message(f"Объект с ID {book_id} успешно удален.")
+        """Удаление книги."""
+        if self.db.delete_record(book_id):
+            self.console.display_message(f"Книга с ID {book_id} удалена.")
         else:
-            self.console.display_message("Файл не найден.")
+            self.console.display_message(f"Книга с ID {book_id} не найдена.")

@@ -99,10 +99,10 @@ class Menu:
 
         """Меню для создания книги."""
 
-        self.console.display_message('Для создания новой книги следуйте пунктам.')
+        self.console.display_message('Меню создания книги.')
         while True:
             try:
-                title = self.console.prompt('Введите название книги: ').strip()
+                title = self.console.prompt('Введите название новой книги: ').strip()
                 if not title:
                     raise ValueError('Название книги не может быть пустым.')
 
@@ -126,9 +126,8 @@ class Menu:
     def search_book_menu(self):
 
         """Меню для поиска книги по параметрам."""
-
-        self.console.display_message('Введите параметры поиска книги.')
-        self.console.display_message('Ненужные параметры оставьте пустыми.')
+        self.console.display_message('Меню поиска книги.')
+        self.console.display_message('Введите параметры поиска книги, ненужные параметры оставьте пустыми.')
         while True:
             try:
                 title = self.console.prompt('Введите название книги: ').strip()
@@ -153,20 +152,16 @@ class Menu:
     def patch_book_menu(self) -> dict:
         """
         Меню для изменения статуса книги.
-        Возвращает словарь с ключом 'status' и булевым значением.
         """
-        self.console.display_message('Изменения статуса книги.')
-
+        self.console.display_message('Меню изменения статуса книги.')
 
         while True:
             try:
-                # Получаем ввод для ID книги
-                book_id = self.console.prompt('Введите ID книги (например, "nwpMYCB0"): ').strip()
+                book_id = self.console.prompt('Введите ID книги что бы изменить ее статус (например, "nwpMYCB0"): ').strip()
 
-                if not book_id:  # Проверка, что ID не пустое
+                if not book_id:
                     raise ValueError('ID книги не может быть пустым.')
 
-                # Получаем ввод для статуса
                 self.console.clear_console()
                 self.console.display_message('Выберите статус книги.')
                 self.console.display_message('1. В наличии')
@@ -178,7 +173,7 @@ class Menu:
 
                 status = int(status_input)
 
-                if status not in {1, 2}:  # Статус должен быть либо 1, либо 2
+                if status not in {1, 2}:
                     raise ValueError('Пожалуйста, выберите число 1 или 2.')
 
                 # Возвращаем словарь с ID книги и статусом
@@ -187,3 +182,19 @@ class Menu:
             except ValueError as e:
                 self.console.display_message(f"Ошибка: {e}")
                 self.console.display_message("Попробуйте ещё раз.\n")
+
+    def delete_book_menu(self):
+        self.console.display_message('Меню удаления книги.')
+        while True:
+            try:
+                book_id = self.console.prompt('Введите ID книги что бы удалить её. (например, "nwpMYCB0"): ').strip()
+
+                if not book_id:
+                    raise ValueError('ID книги не может быть пустым.')
+
+                return book_id
+
+            except ValueError as e:
+                self.console.display_message(f"Ошибка: {e}")
+                self.console.display_message("Попробуйте ещё раз.\n")
+
