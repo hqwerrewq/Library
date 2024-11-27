@@ -1,12 +1,11 @@
 from abc import ABC
-from pathlib import Path
 from typing import List, Optional
 
-from infrastructure.menus.console_interface import ConsoleInterface
 from infrastructure.functions.random import random_id_generator
+from infrastructure.menus.console_interface import ConsoleInterface
 from json_database.json_database import JsonDatabase
-from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface
 from models.LibraryModels import Book
+from repositories.interfaces.library_repository_interface import LibraryRepositoriesInterface
 
 
 class LibraryRepositories(LibraryRepositoriesInterface, ABC):
@@ -15,7 +14,7 @@ class LibraryRepositories(LibraryRepositoriesInterface, ABC):
         self.console = console
         self.db = json_database
 
-    async def add_one(self, title: str, author: str, year: str) -> Book:
+    async def add_one(self, title: str, author: str, year: int) -> Book:
         """Добавление книги."""
         book_id = next(random_id_generator())
         new_book = Book(id=book_id, title=title, author=author, year=year, status=True)

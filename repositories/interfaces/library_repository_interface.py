@@ -12,7 +12,7 @@ class LibraryRepositoriesInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def add_one(self, title: str, author: str, year: str) -> Book:
+    async def add_one(self, title: str, author: str, year: int) -> Book:
         raise NotImplementedError
 
 

@@ -1,6 +1,3 @@
-from os import PathLike
-from pathlib import Path
-
 from infrastructure.menus.console_interface import ConsoleInterface
 from infrastructure.repositories.library_repositories import LibraryRepositories
 from infrastructure.services.library_services import LibraryServices

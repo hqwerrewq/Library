@@ -6,5 +6,5 @@ class Book:
     id: int
     title: str
     author: str
-    year: str
+    year: int
     status: bool

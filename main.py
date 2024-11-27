@@ -1,10 +1,7 @@
 import asyncio
-from pathlib import Path
 
 from infrastructure.dependency_provider import DependencyProvider
 from infrastructure.menus.console_interface import ConsoleInterface, Menu, MenuHandler
-from infrastructure.repositories.library_repositories import LibraryRepositories
-from json_database.json_database import JsonDatabase
 from view.CreateBookLibraryView import CreateBookLibraryView
 from view.DeleteBookLibraryView import DeleteBookLibraryView
 from view.GetBookLibraryView import GetBookLibraryView
